@@ -16,8 +16,8 @@ https://adventofcode.com/2019
 | 5 |  GoLang | &#x2611; |
 | 6 |  JavaScript + NodeJS | &#x2611; |
 | 7 |  CPP | &#x2611; |
-| 8 |  Java | 
-| 9 |  Kotlin | 
+| 8 |  Java | &#x2611; |
+| 9 |  Kotlin | &#x2611; |
 | 10 | Scala | 
 | 11 | Groovy | 
 | 12 | PHP | 
