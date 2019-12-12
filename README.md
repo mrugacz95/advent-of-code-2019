@@ -18,7 +18,7 @@ https://adventofcode.com/2019
 | 7 |  CPP | &#x2611; |
 | 8 |  Java | &#x2611; |
 | 9 |  Kotlin | &#x2611; |
-| 10 | Scala | 
+| 10 | Scala | &#x2611; |
 | 11 | Groovy | 
 | 12 | PHP | 
 | 13 | Swift | 
