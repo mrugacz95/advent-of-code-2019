@@ -132,6 +132,146 @@ class IntegerComputer {
     }
 }
 
+
+class Robot {
+    def position = new Tuple2<Integer, Integer>(0, 0)
+    enum Direction {
+        UP, DOWN, LEFT, RIGHT
+    }
+    def direction = Direction.UP
+    enum Color {
+        BLACK, WHITE, NOT_PAINTED
+    }
+
+    enum Rotate {
+        LEFT, RIGHT
+    }
+    HashMap<Tuple2<Integer, Integer>, Color> board = new HashMap<>()
+
+    def moveForward() {
+        def x = 0
+        def y = 0
+        switch (direction) {
+            case Direction.UP:
+                y -= 1
+                break
+            case Direction.DOWN:
+                y += 1
+                break
+            case Direction.LEFT:
+                x -= 1
+                break
+            case Direction.RIGHT:
+                x += 1
+                break
+        }
+        position = new Tuple2<Integer, Integer>(position.first + x, position.second + y)
+    }
+
+    def paint(Color color) {
+        board[position] = color
+        println(board)
+        println(direction)
+        printBoard()
+    }
+
+    def rotate(Rotate rotate) {
+        if (rotate == Rotate.LEFT) {
+            switch (direction) {
+                case Direction.UP:
+                    direction = Direction.LEFT
+                    break
+                case Direction.DOWN:
+                    direction = Direction.RIGHT
+                    break
+                case Direction.LEFT:
+                    direction = Direction.DOWN
+                    break
+                case Direction.RIGHT:
+                    direction = Direction.UP
+                    break
+            }
+        } else {
+            switch (direction) {
+                case Direction.UP:
+                    direction = Direction.RIGHT
+                    break
+                case Direction.DOWN:
+                    direction = Direction.LEFT
+                    break
+                case Direction.LEFT:
+                    direction = Direction.UP
+                    break
+                case Direction.RIGHT:
+                    direction = Direction.DOWN
+                    break
+            }
+        }
+    }
+
+    def readColor() {
+        return readColor(position)
+    }
+
+    def readColor(Tuple2<Integer, Integer> pos) {
+        if (!board.containsKey(pos)) {
+            return Color.NOT_PAINTED
+        }
+        return board[pos]
+    }
+
+    def countPainted() {
+        return board.size()
+    }
+
+    def printBoard() {
+        def maxX = -Integer.MAX_VALUE
+        def minX = Integer.MAX_VALUE
+        def maxY = -Integer.MAX_VALUE
+        def minY = Integer.MAX_VALUE
+        board.forEach { tuple, color ->
+            maxX = Math.max(tuple.first, maxX)
+            minX = Math.min(tuple.first, minX)
+            maxY = Math.max(tuple.second, maxY)
+            minY = Math.min(tuple.second, minY)
+        }
+        minY.upto(maxY, { y ->
+            minX.upto(maxX, { x ->
+                def pos = new Tuple2(x, y)
+                if (pos == position) {
+                    switch (direction) {
+                        case Direction.UP:
+                            print("^")
+                            break
+                        case Direction.DOWN:
+                            print("V")
+                            break
+                        case Direction.LEFT:
+                            print("<")
+                            break
+                        case Direction.RIGHT:
+                            print(">")
+                            break
+                    }
+                } else {
+                    switch (readColor(pos)) {
+                        case Color.BLACK:
+                            print('.')
+                            break
+                        case Color.WHITE:
+                            print('#')
+                            break
+                        case Color.NOT_PAINTED:
+                            print(' ')
+                            break
+                    }
+                }
+            })
+            println()
+        })
+    }
+}
+
 class Day11 {
     static void main(String[] args) {
         Map<Integer, String> memory = new File("day_11.in")
@@ -142,11 +282,27 @@ class Day11 {
                 .collectEntries { code, idx ->
                     [(idx.toLong()): code]
                 }
+        def robot = new Robot()
+        def colorConsumed = false
+        def paintCounter = 0
         def ic = new IntegerComputer(memory, {
-            return System.in.newReader().readLine().toInteger()
+            println(robot.readColor())
+            return robot.readColor() != Robot.Color.WHITE ? "0" : "1"
         }, {
-            println("output: $it")
+            if (!colorConsumed) {
+                paintCounter += 1
+                println(it == 0L ? "paint black" : "paint white")
+                robot.paint(it == 0L ? Robot.Color.BLACK : Robot.Color.WHITE)
+                colorConsumed = true
+            } else {
+                robot.rotate(it == 0L ? Robot.Rotate.LEFT : Robot.Rotate.RIGHT)
+                println(it == 0L ? "turn left" : "turn right")
+                robot.moveForward()
+                colorConsumed = false
+            }
         })
         ic.run()
+        println(robot.countPainted())
+        println(paintCounter)
     }
 }
