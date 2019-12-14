@@ -170,9 +170,6 @@ class Robot {
 
     def paint(Color color) {
         board[position] = color
-        println(board)
-        println(direction)
-        printBoard()
     }
 
     def rotate(Rotate rotate) {
@@ -284,25 +281,20 @@ class Day11 {
                 }
         def robot = new Robot()
         def colorConsumed = false
-        def paintCounter = 0
         def ic = new IntegerComputer(memory, {
-            println(robot.readColor())
-            return robot.readColor() != Robot.Color.WHITE ? "0" : "1"
+            return robot.readColor() != Robot.Color.WHITE ? 0 : 1
         }, {
             if (!colorConsumed) {
-                paintCounter += 1
-                println(it == 0L ? "paint black" : "paint white")
-                robot.paint(it == 0L ? Robot.Color.BLACK : Robot.Color.WHITE)
+                robot.paint(it == 0 ? Robot.Color.BLACK : Robot.Color.WHITE)
                 colorConsumed = true
             } else {
-                robot.rotate(it == 0L ? Robot.Rotate.LEFT : Robot.Rotate.RIGHT)
-                println(it == 0L ? "turn left" : "turn right")
+                robot.rotate(it == 0 ? Robot.Rotate.LEFT : Robot.Rotate.RIGHT)
                 robot.moveForward()
                 colorConsumed = false
             }
         })
         ic.run()
+        robot.printBoard()
         println(robot.countPainted())
-        println(paintCounter)
     }
 }
