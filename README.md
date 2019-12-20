@@ -21,7 +21,7 @@ https://adventofcode.com/2019
 | 10 | Scala | &#x2611; |
 | 11 | Groovy | &#x2611; |
 | 12 | PHP | &#x2611; |
-| 13 | Swift | 
+| 13 | Swift | &#x2611; |
 | 14 | C# | 
 | 15 | R | 
 | 16 | Julia | 
@@ -33,4 +33,4 @@ https://adventofcode.com/2019
 | 22 | Ada | 
 | 23 | Pascal | 
 | 24 | Dart | 
-| 25 | F# | 
+| 25 | ~~F#~~ Elixir | 
