@@ -25,6 +25,7 @@ var memory = Dictionary(uniqueKeysWithValues:
         .enumerated()
         .map{ ($0, $1) }
 )
+memory[0] = 2
 struct Coord: Hashable {
     let x: Int
     let y: Int
@@ -43,22 +44,7 @@ var screen = [Coord:Type]()
 var x = 0
 var y = 0
 var inputType = 0
-
-let ic = IntegerComputer(memory: memory, input: {
-    return Int(readLine(strippingNewline: true)!)!
-}) { (number:Int) -> ()  in
-    switch(inputType){
-    case 0: x = number
-        break
-    case 1: y = number
-        break
-    default:
-        screen[Coord(x: x, y: y)] = Type.init(rawValue: number)
-    }
-    inputType = (inputType + 1) % 3
-}
-
-ic.run()
+var score = 0
 
 func display(){
     var maxX = 0
@@ -71,8 +57,9 @@ func display(){
         maxY = max(maxY, coord.y)
         minY = min(minY, coord.y)
     }
-    for x in minX...maxX {
-        for y in minY...maxY {
+    print("\u{001B}[2J")
+    for y in minY...maxY {
+        for x in minX...maxX {
             if let block = screen[Coord(x:x, y:y)] {
                 switch(block){
                 case Type.empty: print(" ", terminator: " ")
@@ -90,13 +77,52 @@ func display(){
                 print(" ", terminator: " ")
             }
         }
+        print()
+    }
+    print("Score \(score)")
+    usleep(55000)
+}
+var lastBallPos: Coord?  = nil
+func makeAction() -> Int {
+    func find(type: Type) -> Coord? {
+        for (coord, block) in screen {
+            if block == type {
+                return coord
+            }
+        }
+        return nil
+    }
+    let ballPos = find(type: Type.ball)! // Ball for sure is somewhere
+    let paddlePos = find(type: Type.paddle)!
+    lastBallPos = ballPos
+    if paddlePos.x > ballPos.x {
+        return -1
+    } else if paddlePos.x == ballPos.x {
+        return 0
+    } else {
+        return 1
     }
 }
 
-var blockTiles = 0
-for (_, block) in screen {
-    if block == Type.block {
-        blockTiles += 1
+let ic = IntegerComputer(memory: memory, input: {
+//    display()
+    return makeAction()
+}) { (number:Int) -> ()  in
+    switch(inputType){
+    case 0: x = number
+        break
+    case 1: y = number
+        break
+    default:
+        if(x == -1 && y == 0){
+            score = number
+        } else {
+            screen[Coord(x: x, y: y)] = Type.init(rawValue: number)
+        }
     }
+    inputType = (inputType + 1) % 3
 }
-print(blockTiles)
+
+ic.run()
+
+print(score)
