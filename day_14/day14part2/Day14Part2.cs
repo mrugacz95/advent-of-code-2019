@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace day_14
+namespace day_14_part_2
 {
-    class Program
+    class Day14Part2
     {
-
-
         static void Main(string[] args)
         {
             byte[] inputBytes = Properties.Resources.day_14;
             var input = System.Text.Encoding.UTF8.GetString(inputBytes);
             new Solution(input);
         }
-    }
 
+    }
     class Edge
     {
-        public int quantity { get; }
+        public uint quantity { get; }
         public string target { get; }
 
-        public Edge(int quantity, string target)
+        public Edge(uint quantity, string target)
         {
             this.quantity = quantity;
             this.target = target;
@@ -32,8 +33,8 @@ namespace day_14
     {
         public Status status = Status.NOT_VISITED;
         public List<Edge> edges { get; } = new List<Edge>();
-        public int quantityObtained;
-        public int quantityReuqired = 0;
+        public ulong quantityObtained;
+        public ulong quantityReuqired = 0;
     }
 
     class Solution
@@ -59,10 +60,52 @@ namespace day_14
             sorted.Add(node);
         }
 
-        Tuple<Int32, string> getQuantityAndName(string substance)
+        Tuple<uint, string> getQuantityAndName(string substance)
         {
             var parts = substance.Split(' ');
-            return new Tuple<Int32, string>(Convert.ToInt32(parts[0]), parts[1]);
+            return new Tuple<uint, string>(Convert.ToUInt32(parts[0]), parts[1]);
+        }
+
+        ulong calculateOreRequired(ulong fuel) { 
+        
+            foreach(var vertex in graph){
+                vertex.Value.quantityReuqired = 0;
+            }
+            graph["FUEL"].quantityReuqired = fuel;
+            foreach (var vertex in sorted)
+            {
+                foreach (var edge in graph[vertex].edges)
+                {
+                    ulong numberOfReactions = (ulong)Math.Ceiling(((double)graph[vertex].quantityReuqired) / ((double)graph[vertex].quantityObtained));
+                    graph[edge.target].quantityReuqired += edge.quantity * numberOfReactions;
+                }
+            }
+            return graph["ORE"].quantityReuqired;
+        }
+
+        ulong binarySearch()
+        {
+            ulong minFuel = 0;
+            ulong maxFuel = 1000000000; // Increase if needed
+            ulong maxCapacity = 1000000000000;
+            ulong answer = 0;
+            while (minFuel <= maxFuel)
+            {
+                var mid = (minFuel + maxFuel) / 2;
+
+                var oreRequired = calculateOreRequired(mid);
+    
+                if (oreRequired >= maxCapacity)
+                {
+                    maxFuel = mid - 1;
+                }
+                else
+                {
+                    answer = mid;
+                    minFuel = mid + 1;
+                }
+            }
+            return answer;
         }
 
         public Solution(string input)
@@ -71,7 +114,8 @@ namespace day_14
             {
                 var parts = line.Trim().Split(new[] { " => " }, StringSplitOptions.RemoveEmptyEntries);
                 var product = getQuantityAndName(parts[1]);
-                if (!graph.ContainsKey(product.Item2)){
+                if (!graph.ContainsKey(product.Item2))
+                {
                     graph.Add(product.Item2, new Vertex());
                 }
                 graph[product.Item2].quantityObtained = product.Item1;
@@ -95,22 +139,8 @@ namespace day_14
                 }
             }
             sorted.Reverse();
-            Console.WriteLine("Sorted:");
-            foreach (var vertex in sorted)
-            {
-                Console.Write("{0}, ", vertex);
-            }
             Console.WriteLine();
-            graph["FUEL"].quantityReuqired = 1;
-            foreach (var vertex in sorted)
-            {
-                foreach (var edge in graph[vertex].edges)
-                {
-                    int numberOfReactions = (int)Math.Ceiling(((float)graph[vertex].quantityReuqired) / ((float)graph[vertex].quantityObtained));
-                    graph[edge.target].quantityReuqired += edge.quantity * numberOfReactions;
-                }
-            }
-            Console.WriteLine("ORE required: {0}", graph["ORE"].quantityReuqired);
+            Console.WriteLine("FUEL able to produce: {0}", binarySearch());
         }
     }
 }
