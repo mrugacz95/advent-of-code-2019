@@ -24,7 +24,7 @@ https://adventofcode.com/2019
 | 13 | Swift | &#x2611; | XCode |
 | 14 | C# | &#x2611; | Visual Studio |
 | 15 | R | &#x2611; | RStudio |
-| 16 | Julia | &#x2611; | Juno |
+| 16 | Julia | &#x2611; | Jupyter |
 | 17 | Lua | 
 | 18 | Lisp | 
 | 19 | Octave/MATLAB | 
