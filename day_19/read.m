@@ -1,0 +1,1 @@
+function value = read(pos, mem)    if(length(mem) < pos + 1)        mem(pos+1) = 0;    endif    value = mem(pos + 1);endfunction
