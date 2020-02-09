@@ -25,9 +25,9 @@ https://adventofcode.com/2019
 | 14 | C# | &#x2611; | Visual Studio |
 | 15 | R | &#x2611; | RStudio |
 | 16 | Julia | &#x2611; | Jupyter |
-| 17 | Lua | 
-| 18 | Lisp | 
-| 19 | Octave/MATLAB | 
+| 17 | Lua | &#x2611; | PyCharm |
+| 18 | Lisp | &#x2611; | Atom  + atom-slime |
+| 19 | Octave/MATLAB | &#x2611; | Octave GUI |
 | 20 | Perl | 
 | 21 | Rust | 
 | 22 | Ada | 
