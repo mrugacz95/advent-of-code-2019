@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use Exporter;
 
 use Exporter qw(import);
-our @EXPORT = qw(readGrid grid_at coord_2_int int_2_coord find_neighbours build_graph dfs);
+our @EXPORT = qw(readGrid grid_at coord_2_int int_2_coord find_neighbours build_graph);
 
 sub readGrid() {
     open(MAP, "<day_20.in") or die "Couldn't open input";
@@ -120,31 +120,5 @@ sub build_graph {
             $exit = @{$portals{$key}}[0];
         }
     }
-    return($entrance, $exit, %graph);
-}
-
-
-sub dfs {
-    my ($from, $to, %graph) = @_;
-    my @queue;
-    my @distance;
-    my %visited;
-    push(@queue, $from);
-    push(@distance, 0);
-    while (scalar(@queue) > 0) {
-        my $current = shift(@queue);
-        $visited{$current} = 1;
-        my $dist = shift(@distance);
-        if ($current == $to) {
-            return($dist);
-        }
-        my @neighbours = @{$graph{$current}};
-        foreach my $neighbour (@neighbours) {
-            if (!exists($visited{$neighbour})) {
-                push(@queue, $neighbour);
-                push(@distance, $dist + 1);
-            }
-        }
-    }
-    print("Not found\n");
+    return($entrance, $exit, \%graph, \%portals);
 }
