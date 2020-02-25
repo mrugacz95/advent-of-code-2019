@@ -8,7 +8,7 @@ my @grid = readGrid();
 my $width = scalar(@{$grid[0]});
 my $height = scalar(@grid);
 
-my ($entrance, $exit, $graph, $portals) = &build_graph($height, $width, @grid);
+my ($entrance, $exit, $graph, $portals) = &build_graph($height, $width, 1, @grid);
 
 
 sub dfs {

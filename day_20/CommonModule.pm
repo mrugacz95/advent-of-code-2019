@@ -77,7 +77,7 @@ sub build_graph {
             add_portal($code, $coords, $p_ref);
         }
     }
-    my ($height, $width, @grid) = @_;
+    my ($height, $width, $add_links, @grid) = @_;
     my %graph;
     for (my $y = 1; $y < $height - 1; $y++) {
         for (my $x = 1; $x < $width - 1; $x++) {
@@ -110,8 +110,10 @@ sub build_graph {
         if (scalar(@positions) == 2) {
             my $from = $positions[0];
             my $to = $positions[1];
-            push(@{$graph{$from}}, $to);
-            push(@{$graph{$to}}, $from);
+            if($add_links == 1){
+                push(@{$graph{$from}}, $to);
+                push(@{$graph{$to}}, $from);
+            }
         }
         elsif ($key eq 'AA') {
             $entrance = @{$portals{$key}}[0];
