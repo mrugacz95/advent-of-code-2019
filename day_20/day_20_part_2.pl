@@ -61,11 +61,9 @@ foreach my $portal_name (keys(%$portals)) {
         $dist_mat{$portal_position} = { $portal_position => 0 };
         foreach my $portal_pos (@all_portal_positions) {
             if (exists($to_all{$portal_pos})) {
-                # print("{$portal_position}->{$portal_pos} = $to_all{$portal_pos} \n");
                 $dist_mat{$portal_position}->{$portal_pos} = $to_all{$portal_pos};
             }
             else {
-                # print("{$portal_position}->{$portal_pos} = inf \n");
                 $dist_mat{$portal_position}->{$portal_pos} = "inf";
             }
         }
@@ -76,23 +74,10 @@ sub print_dist_mat() {
     # print dist matrix
     foreach my $row_portal (keys(%$portals)) {
         foreach my $row_pos (@{$portals->{$row_portal}}) {
-            print("$row_portal");
-            if (isOuter($row_pos)) {
-                print("(O)\n")
-            }
-            else {
-                print("(I)\n");
-            }
+            print("$row_portal" . formatOuter($row_pos) . "\n");
             foreach my $col_portal (keys(%$portals)) {
                 foreach my $col_pos (@{$portals->{$col_portal}}) {
-                    # print("$row_portal AA dist " . $dist_mat{1511}->{1511});
-                    print("\t$col_portal");
-                    if (isOuter($col_pos)) {
-                        print("(O)")
-                    }
-                    else {
-                        print("(I)");
-                    }
+                    print("\t$col_portal" . formatOuter($col_pos) . "\n");
                     print(":$dist_mat{$row_pos}->{$col_pos}\n")
                 }
             }
@@ -102,39 +87,14 @@ sub print_dist_mat() {
 # fix portals list to have outer in first position. AA and ZZ entries will not be changed.
 sub fix_portals {
     my $portals_ref = $_[0];
-    print("portals ref $portals_ref\n");
     foreach my $key (keys(%$portals_ref)) {
         if (!isOuter(@{$portals_ref->{$key}}[0])) {
             my $list = $portals_ref->{$key};
-            # print("$key @$list\n");
             $portals_ref->{$key} = [ $list->[1], $list->[0] ];
         }
     }
 }
 
-
-# region checks
-# print("$dist_mat{263}->{3171}\n"); # should be 503
-# print("is outer ". isOuter(9156) ."\n");
-# foreach my $portal_pos (@all_portal_positions){
-#     print("$portals_reverse{$portal_pos} is $portal_pos\n")
-# }
-# end checks
-# print("dupa\n");
-# foreach my $key (keys(%$portals)){
-#     print("k:$key ");
-#     print("v:$portals->{$key}->[0]\n");
-#     if(!isOuter($portals->{$key}->[0])){
-#         print("Bad outer order\n");
-#     }
-# }
-# sub multi_dimensinal_dfs{
-#     my ($graph_ref, $portals_ref, $h, $w, $dist_mat) = @_;
-#     my $max_level = 0;
-#     my $level_offset = $height * $width;
-#     my %graph = {}
-#     
-# }
 fix_portals($portals);
 
 sub formatOuter {
@@ -146,9 +106,8 @@ sub formatOuter {
 }
 
 sub multi_dimensional_dfs {
-    my ($graph_ref, $portals_ref, $h, $w, $dist_mat) = @_;
+    my ($portals_ref, $h, $w, $dist_mat) = @_;
     my $max_level = 0;
-    my $level_offset = $height * $width;
     my %visited;
     # distance, level, name
     my @nodes = ([ 0, 0, @{$portals_ref->{"AA"}}[0], "AA" ],
@@ -162,29 +121,24 @@ sub multi_dimensional_dfs {
     }
     while (scalar(@nodes) > 0) {
         # find nearest, priority queue should be used 
-        # print("nodes len " . scalar(@nodes) . "\n");
         my $nearest = 0;
         for my $i (1 .. scalar(@nodes) - 1) {
-            # print("$i $nodes[$i][0]\n");
             if ($nodes[$i][0] < $nodes[$nearest][0]) {
                 $nearest = $i;
-                # print("nearest $i\n");
             }
         }
         my ($distance, $level, $position, $name) = @{$nodes[$nearest]};
-        print("Current: $name " . formatOuter($position) . " lvl: $level dist: $distance\n");
-        # print("nearest $nearest ");
-        # print("$distance, $level, $position $name " . isOuter($position) . "\n");
+        # print("Current: $name " . formatOuter($position) . " lvl: $level dist: $distance\n");
         if ($name eq "ZZ" and $level == 0) {
-            print("Distance $distance");
+            print("Distance to exit $distance");
             last;
         }
         if ($name ne 'AA' and $name ne "ZZ") {
             if (!isOuter($position)) {
+                # is inner 
                 if ($level == $max_level) {
-                    # is inner
                     # add next level nodes
-                    print("Need to add next dimension, node: $name (" . isOuter($position) . "), current max: $max_level\n");
+                    # print("Need to add next dimension, node: $name (" . isOuter($position) . "), current max: $max_level\n");
                     $max_level += 1;
                     foreach my $portal_name (keys(%$portals_ref)) {
                         if ($portal_name eq "AA" or $portal_name eq "ZZ") {
@@ -200,15 +154,15 @@ sub multi_dimensional_dfs {
                 }
                 else {
                     # update only outer node
-                    print("Updating next dimension outer node distance\n");
+                    # print("Updating next dimension outer node distance\n");
                     foreach my $inner_ref (@nodes) {
-                        # find corresponding inner and update dist 
+                        # find corresponding outer node and update dist 
                         my ($inner_dist, $inner_lvl, $inner_pos, $inner_name) = @$inner_ref;
                         if ($name eq $inner_name
                             and ($inner_lvl == $level + 1)
                             and ($inner_dist > $distance + 1)
                             and isOuter($inner_pos)) {
-                            print("Update needed\n");
+                            # print("Update needed\n");
                             $inner_ref->[0] = $distance + 1;
                             last;
                         }
@@ -216,16 +170,16 @@ sub multi_dimensional_dfs {
                 }
             }
             elsif (isOuter($position)) {
-                # is outer and not ZZ
-                print("Updating previous dimension inner node distance\n");
+                # is outer
+                # print("Updating previous dimension inner node distance\n");
                 foreach my $inner_ref (@nodes) {
-                    # find corresponding inner and update dist 
+                    # find corresponding inner node and update dist 
                     my ($inner_dist, $inner_lvl, $inner_pos, $inner_name) = @$inner_ref;
                     if ($name eq $inner_name
                         and ($inner_lvl == $level - 1)
                         and ($inner_dist > $distance + 1)
                         and !isOuter($inner_pos)) {
-                        print("Update needed\n");
+                        # print("Update needed\n");
                         $inner_ref->[0] = $distance + 1;
                         last;
                     }
@@ -238,22 +192,16 @@ sub multi_dimensional_dfs {
         # mark distances to neighbours
         for my $node_ref (@nodes) {
             my ($neigh_dist, $neigh_lvl, $neigh_pos, $neigh_name) = @$node_ref;
-            # print("lvl $level $neigh_lvl\n");
-            # print("dist $distance $neigh_dist\n");
             if ((exists($dist_mat->{$position}->{$neigh_pos}) and $neigh_lvl == $level)
                 or ($neigh_name eq $name and !isOuter($neigh_pos) and isOuter($position) and $neigh_lvl = $level - 1)
                 or ($neigh_name eq $name and isOuter($neigh_pos) and !isOuter($position) and $neigh_lvl - 1 == $level)) {
-                # same lvl, same name +=1 lvl, dist exists!
-                # print("dist $distance $position $neigh_pos\n");
-                # print("dist_mat $dist_mat->{$position}");
                 my $new_dist = $distance + $dist_mat->{$position}->{$neigh_pos};
                 if ($new_dist < $neigh_dist) {
                     $node_ref->[0] = $new_dist;
-                    # print("dist changed")
                 }
             }
         }
     }
 }
 
-multi_dimensional_dfs($graph, $portals, $height, $width, \%dist_mat)
+multi_dimensional_dfs($portals, $height, $width, \%dist_mat)
