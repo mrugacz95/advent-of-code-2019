@@ -1,20 +1,24 @@
 use std::collections::HashMap;
 
-pub struct IntegerComputer {
+pub struct IntegerComputer<I, O>
+where
+    I: FnMut() -> isize,
+    O: Fn(isize) -> (),
+{
     memory: HashMap<usize, isize>,
     running: bool,
     pointer: usize,
     relative_base: isize,
-    input_fn: fn() -> isize,
-    output_fn: fn(isize),
+    input_fn: I,
+    output_fn: O,
 }
 
-impl IntegerComputer {
-    pub fn new(
-        memory: HashMap<usize, isize>,
-        input_fn: fn() -> isize,
-        output_fn: fn(isize),
-    ) -> IntegerComputer {
+impl<I, O> IntegerComputer<I, O>
+where
+    I: FnMut() -> isize,
+    O: Fn(isize) -> (),
+{
+    pub fn new(memory: HashMap<usize, isize>, input_fn: I, output_fn: O) -> IntegerComputer<I, O> {
         return IntegerComputer {
             memory,
             running: true,
