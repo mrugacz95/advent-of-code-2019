@@ -6,3 +6,5 @@ NOT T T
 AND D T
 OR T J
 WALK
+# NOT(A AND B AND C) AND D
+# D AND NOT(C AND (B AND (A AND True)))

@@ -1,0 +1,21 @@
+OR D T
+AND H T
+OR D J
+AND E J
+OR T J
+OR T T
+AND A T
+AND B T
+AND C T
+NOT T T
+AND D T
+AND T J
+RUN
+# NOT (A AND B AND C) AND ((D AND H) OR (D AND E))
+# T = D AND H
+# J = D AND E
+# J = T OR J
+# T = True
+# T = T AND A AND B AND C
+# T = NOT T
+# J = T AND J
