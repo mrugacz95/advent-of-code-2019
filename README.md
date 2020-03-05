@@ -28,8 +28,8 @@ https://adventofcode.com/2019
 | 17 | Lua | &#x2611; | PyCharm |
 | 18 | Lisp | &#x2611; | Atom  + atom-slime |
 | 19 | Octave/MATLAB | &#x2611; | Octave GUI |
-| 20 | Perl | 
-| 21 | Rust | 
+| 20 | Perl | &#x2611; | PyCharm |
+| 21 | Rust | &#x2611; | PyCharm |
 | 22 | Ada | 
 | 23 | ~~Pascal~~ Haskel | 
 | 24 | Dart | 
