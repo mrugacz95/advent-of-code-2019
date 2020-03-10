@@ -1,11 +1,14 @@
-with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Containers.Vectors;
-use Ada.Containers;
+with Ada.Text_IO, Ada.Strings.Fixed;
+use Ada.Text_IO, Ada.Strings.Fixed;
 
 procedure Day_22 is
-    type Card is range 0..9;
-    type Deck_Type is array (0..9) of Card;
+    type Card is range 0..10006;
+    type Deck_Type is array (0..10006) of Card;
     Deck : Deck_Type;
+    Input : File_Type;
+    Command_Number : String := "        ";
+    Command : String := "                                  ";
+    Number : Integer;
     function Deal_Into_New_Stack(Deck: in Deck_Type) return Deck_Type is
         Tmp_Deck : Deck_Type;
     begin
@@ -21,7 +24,6 @@ procedure Day_22 is
         If Number < 0 then
             N := Deck_Type'Last + Number + 1;
         end if;
-        Put_Line(Integer'Image(N));
         For I in Deck'First..Deck'Last - N loop
             Tmp_Deck(I) := Deck(I + N);
         end loop;
@@ -41,15 +43,52 @@ procedure Day_22 is
         end loop;
         return Tmp_Deck;
     end Deal_With_Increment;
+    function Prepare_Deck return Deck_Type is
+    begin
+        For I in Deck'Range loop
+            Deck(I) := Card(I);
+        end loop;
+        return Deck;
+    end Prepare_Deck;
+    procedure Split(
+        TheString : in String; Pos : in Integer;
+        Part1 : out String; Part2 : out String) is
+    begin
+       Move(TheString(TheString'First .. Pos - 1), Part1);
+       Move(TheString(Pos .. TheString'Last), Part2);
+    end Split;
 begin
-    For I in Deck'Range loop
-        Deck(I) := Card(I);
-    end loop;
-    Deck := Deal_With_Increment(Deck, 7);
-    Deck := Deal_With_Increment(Deck, 9);
-    Deck := Cut_N_Cards(Deck, -2);
-    For I in Deck'Range loop
-        Put_Line( Integer'Image(I) & "" & Card'Image(Deck(I)));
-    end loop;
+    Deck := Prepare_Deck;
+    Open (File => Input,
+        Mode => In_File,
+        Name => "day_22.in");
+    loop
+      declare
+         Line : String := Get_Line (Input);
+      begin
+        If Line = "deal into new stack" then
+            Deck := Deal_Into_New_Stack(Deck);
+--              Put_Line("deal into new stack");
+        elsif Line(1 .. 4) = "cut " then
+            Split(Line, 5, Command, Command_Number);
+            Number := Integer'Value(Command_Number);
+--              Put_Line("cut " & Integer'Image(Number));
+            Deck := Cut_N_Cards(Deck, Number);
+        elsif Line(1 .. 20) = "deal with increment " then
+            Split(Line, 21, Command, Command_Number);
+            Number := Integer'Value(Command_Number);
+--              Put_Line("deal with increment" & Integer'Image(Number));
+            Deck := Deal_With_Increment(Deck, Number);
+        end If;
+        exit when End_Of_File(Input);
+      end;
+   end loop;
+   Close (Input);
+   For I in Deck'Range loop
+        If Deck(I) = 2019 then
+            Put(Integer'Image(I));
+            exit;
+        end If;
+   end loop;
 end Day_22;
 
