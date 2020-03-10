@@ -68,16 +68,13 @@ begin
       begin
         If Line = "deal into new stack" then
             Deck := Deal_Into_New_Stack(Deck);
---              Put_Line("deal into new stack");
         elsif Line(1 .. 4) = "cut " then
             Split(Line, 5, Command, Command_Number);
             Number := Integer'Value(Command_Number);
---              Put_Line("cut " & Integer'Image(Number));
             Deck := Cut_N_Cards(Deck, Number);
         elsif Line(1 .. 20) = "deal with increment " then
             Split(Line, 21, Command, Command_Number);
             Number := Integer'Value(Command_Number);
---              Put_Line("deal with increment" & Integer'Image(Number));
             Deck := Deal_With_Increment(Deck, Number);
         end If;
         exit when End_Of_File(Input);

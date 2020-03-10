@@ -1,5 +1,5 @@
-if gnatmake day_22.adb -o day_22.out; then
-  ./day_22.out
+if gnatmake $1 -o output; then
+  ./output
 else
   echo "Compilation failed"
 fi
