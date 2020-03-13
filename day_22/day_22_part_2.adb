@@ -6,7 +6,7 @@ procedure Day_22_part_2 is
     type Repeat is range 0..0;
     type Position is range 0..9;
     Input_File : String := "day_22.in";
-    Start_Position : Position := 7;
+    Start_Position : Position := 9;
     Card : Position := Start_Position;
     Input : File_Type;
     Command_Number : String := "                                  ";
@@ -28,22 +28,18 @@ procedure Day_22_part_2 is
         N: Position;
     begin
         If Number < Long(0) then -- Change negative cut into positive
-            N := Position(Long(Position'Last) - Number + Long(Card));
+            N := Position(Long(Position'Last) + Number + Long(1));
         else
             N := Position(Number);
         end if;
-        Put_Line(Position'Image(Card));
-        If Card < N then
-            return Position'Last - N + Card + 1;
+        If Card > Position'Last - N then
+            return Card - Position'Last + N - 1;
         else
-            return Card - N;
+            return Card + N;
         end If;
     end Cut_N_Cards;
     function Deal_With_Increment (Card: in out Position; Number: in Long) return Position is
     begin
-        If Number = 1 then
-            return Card;
-        end If;
         return Position(
                             (Long(Card) *
                                 ((Long(Position'Last) + Long(1)) - Number)
@@ -93,17 +89,12 @@ begin
             elsif Line(1 .. 4) = "cut " then
                 Split(Line, 5, Command_String, Command_Number);
                 Number := Long(Integer'Value(Command_Number));
---                  If Number > 0 then
---                      Number := Long(Long(Position'Last) + Long(1)) - Number;
---                  else
---                      Number := -Long(Position'Last) - Long(1) - Number;
---                  end If;
                 Commands(I) := (Cut, Number);
             elsif Line(1 .. 20) = "deal with increment " then
                 Split(Line, 21, Command_String, Command_Number);
                 Number := Long(Integer'Value(Command_Number));
-                If Number /= Long(1) and Number /= Long(Position'Last) then
-                        Number := Long(Position'Last + 1) - Number;
+                If Number = Long(1) or Number = Long(Position'Last) then
+                        Number := Long(Position'Last) + 1 - Number;
                 end If;
                 Commands(I) := (Deal_Inc, Number);
             end If;
@@ -112,10 +103,9 @@ begin
           end;
        end loop;
        Close (Input);
-       Put_Line("Start " & Position'Image(Card));
        For I in 0..0 loop
---             Put_Line(Position'Image(Card) & Integer'Image(I));
-           For J in Commands'Range loop
+           For J in reverse Commands'Range loop
+--                  Put_Line(Technique_Type'Image(Commands(J).Technique) & " " & Long'Image(Commands(J).Number));
                 case Commands(J).Technique is
                     when Deal =>
                          Card := Deal_Into_New_Stack(Card);
@@ -124,8 +114,8 @@ begin
                     when Deal_Inc =>
                          Card := Deal_With_Increment(Card, Commands(J).Number);
                 end case;
-                Put_Line(Position'Image(Card));
            end loop;
+           Put_Line(Position'Image(Card));
        end loop;
     end;
     Put_Line(" ");
