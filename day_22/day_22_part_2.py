@@ -44,10 +44,10 @@ def pow_mod(x, n, m):
 
 
 def F_repeated_k_inverse(F, k, x):
-    a, b = F
-    a_k = pow_mod(a, k, M)
-    A = a_k
-    B = b * (1 - a_k) * inverse_mod(1 - a, M)
+    # here be dragons
+    Fa, Fb = F
+    A = pow_mod(Fa, k, M)
+    B = Fb * (1 - A) * inverse_mod(1 - Fa, M)
     return (x - B) * inverse_mod(A, M) % M
 
 
