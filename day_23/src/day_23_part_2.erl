@@ -1,4 +1,4 @@
--module(day_23).
+-module(day_23_part_2).
 
 %% API exports
 -export([main/1]).
@@ -53,11 +53,10 @@ count_messages(Addresses, Counter) ->
   end.
 
 
-
 %% escript Entry point
 
 main(_) ->
-  io:fwrite("Part 1~n"),
+  io:fwrite("Part 2~n"),
   Mem = read_memory("day_23.in"),
   register(master, self()),
   Addresses = spawn_computers(50, Mem),
