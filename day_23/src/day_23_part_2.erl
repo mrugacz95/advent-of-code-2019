@@ -1,7 +1,7 @@
 -module(day_23_part_2).
 
 %% API exports
--export([main/1]).
+-export([main/1, nat_proc/3]).
 
 %%====================================================================
 %% API functions
@@ -35,12 +35,18 @@ count_messages(Addresses, Counter) ->
                      receive
                        {output, S, Y} when S == Sender ->
                          if
-                           N == 255 -> io:format("Answer is ~p~n", [Y]),
-                             [exit(E, ok) || E <- Addresses],
-                             true;
+                           N == 256 ->
+%%                             io:format("Gracefully finishing~n"),
+%%                             [exit(E, ok) || E <- Addresses],
+%%                             exit(whereis(nat), ok),
+                             io:format("Answer is ~p~n", [Y]),
+                             false;
+                           N == 255 ->
+%%                             io:format("Nat hit with ~p ~p~n", [X, Y]),
+                             nat ! {X, Y},
+                             false;
                            true ->
                              Addr = lists:nth(N + 1, Addresses),
-%%                             io:format("Msg from ~p to ~p: X=~p,Y=~p~n", [Sender, N, X, Y]),
                              Addr ! X,
                              Addr ! Y,
                              false
@@ -53,6 +59,33 @@ count_messages(Addresses, Counter) ->
   end.
 
 
+nat_proc(Addresses, X, Y) ->
+  receive
+    {RecvX, RecvY} ->
+      {message_queue_len, NatLen} = process_info(self(), message_queue_len),
+      if % Repeat as new messages are available
+        NatLen /= 0 -> nat_proc(Addresses, X, Y);
+        true -> ok
+      end,
+      Is_Idle = fun(Pid) ->
+        {message_queue_len, Len} = process_info(Pid, message_queue_len),
+        Len == 0
+                end,
+      Idle = lists:all(Is_Idle, Addresses),
+      SentY = if Idle ->
+        master ! {output, self(), 0}, % receiver
+        master ! {output, self(), RecvX}, % X
+        master ! {output, self(), RecvY}, % Y
+        if RecvY == Y ->
+          master ! {output, self(), 256}, % receiver
+          master ! {output, self(), Y}, % X
+          master ! {output, self(), Y}; % Y
+          true -> RecvY
+        end;
+                true -> Y
+              end,
+      nat_proc(Addresses, X, SentY)
+  end.
 %% escript Entry point
 
 main(_) ->
@@ -60,6 +93,9 @@ main(_) ->
   Mem = read_memory("day_23.in"),
   register(master, self()),
   Addresses = spawn_computers(50, Mem),
+  Nat_Pid = spawn(day_23_part_2, nat_proc, [Addresses, null, null]),
+  register(nat, Nat_Pid),
+%%  nat(Addresses, null, null, null),
   count_messages(Addresses, 0).
 
 %%====================================================================
