@@ -3,7 +3,7 @@
 %% API
 -export([run/2]).
 
--record(computer, {mem, pointer = 0, relative_base = 0, pid = -1, queue = []}).
+-record(computer, {mem, pointer = 0, relative_base = 0, pid = -1}).
 
 read(Mem, Addr) ->
   maps:get(Addr, Mem, 0).

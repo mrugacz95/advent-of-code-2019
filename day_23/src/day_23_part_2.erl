@@ -1,7 +1,7 @@
 -module(day_23_part_2).
 
 %% API exports
--export([main/1, nat_proc/3]).
+-export([main/1, nat_proc/2, monitor_proc/2]).
 
 %%====================================================================
 %% API functions
@@ -36,14 +36,14 @@ count_messages(Addresses, Counter) ->
                        {output, S, Y} when S == Sender ->
                          if
                            N == 256 ->
-%%                             io:format("Gracefully finishing~n"),
-%%                             [exit(E, ok) || E <- Addresses],
-%%                             exit(whereis(nat), ok),
+                             io:format("Gracefully finishing~n"),
+                             [exit(E, ok) || E <- Addresses],
+                             exit(whereis(nat), ok),
                              io:format("Answer is ~p~n", [Y]),
-                             false;
+                             true;
                            N == 255 ->
 %%                             io:format("Nat hit with ~p ~p~n", [X, Y]),
-                             nat ! {X, Y},
+                             nat ! {post, X, Y},
                              false;
                            true ->
                              Addr = lists:nth(N + 1, Addresses),
@@ -58,33 +58,46 @@ count_messages(Addresses, Counter) ->
     true -> count_messages(Addresses, Counter + 1)
   end.
 
+monitor_proc(Addresses, Y) ->
+  Is_Idle = fun(Pid) ->
+    {message_queue_len, Len} = process_info(Pid, message_queue_len),
+    Len == 0
+            end,
+  Idle = lists:all(Is_Idle, Addresses),
+  {SentY, Finished} = if Idle ->
+    nat ! {get, self()},
+    receive
+      {RecvX, RecvY} ->
+        if
+          RecvY /= Y -> % resume network
+            master ! {output, self(), 0}, % receiver
+            master ! {output, self(), RecvX}, % X
+            master ! {output, self(), RecvY}, % Y
+            {RecvY, false};
+          true -> % finish computation
+            master ! {output, self(), 256}, % receiver
+            master ! {output, self(), Y}, % X
+            master ! {output, self(), Y}, % Y
+            {RecvY, true}
+        end
+    end;
+                        true -> {Y, false}
+                      end,
+  if
+    Finished ->
+      ok;
+    true ->
+      timer:sleep(50), % wait till next idle check
+      monitor_proc(Addresses, SentY)
+  end.
 
-nat_proc(Addresses, X, Y) ->
+nat_proc(X, Y) ->
   receive
-    {RecvX, RecvY} ->
-      {message_queue_len, NatLen} = process_info(self(), message_queue_len),
-      if % Repeat as new messages are available
-        NatLen /= 0 -> nat_proc(Addresses, X, Y);
-        true -> ok
-      end,
-      Is_Idle = fun(Pid) ->
-        {message_queue_len, Len} = process_info(Pid, message_queue_len),
-        Len == 0
-                end,
-      Idle = lists:all(Is_Idle, Addresses),
-      SentY = if Idle ->
-        master ! {output, self(), 0}, % receiver
-        master ! {output, self(), RecvX}, % X
-        master ! {output, self(), RecvY}, % Y
-        if RecvY == Y ->
-          master ! {output, self(), 256}, % receiver
-          master ! {output, self(), Y}, % X
-          master ! {output, self(), Y}; % Y
-          true -> RecvY
-        end;
-                true -> Y
-              end,
-      nat_proc(Addresses, X, SentY)
+    {post, RecvX, RecvY} ->
+      nat_proc(RecvX, RecvY);
+    {get, Sender} ->
+      Sender ! {X, Y},
+      nat_proc(X, Y)
   end.
 %% escript Entry point
 
@@ -93,9 +106,9 @@ main(_) ->
   Mem = read_memory("day_23.in"),
   register(master, self()),
   Addresses = spawn_computers(50, Mem),
-  Nat_Pid = spawn(day_23_part_2, nat_proc, [Addresses, null, null]),
+  Nat_Pid = spawn(day_23_part_2, nat_proc, [null, null]),
+  spawn(day_23_part_2, monitor_proc, [Addresses, null]),
   register(nat, Nat_Pid),
-%%  nat(Addresses, null, null, null),
   count_messages(Addresses, 0).
 
 %%====================================================================
