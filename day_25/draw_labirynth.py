@@ -141,104 +141,72 @@ def draw(room_map, start_node=None):
 def main():
     room_maps = [
         {
-            1: {
-                'north': 2
-            },
-            2: {
-                'south': 1,
-                'west': 3
-            },
-            3: {
-                'east': 2,
-                'south': 4
-            },
-            4: {
-                'south': 13,
+            1: {'north': 2},
+            2: {'south': 1,
+                'west': 3},
+            3: {'east': 2,
+                'south': 4},
+            4: {'south': 13,
                 'east': 5,
-                'north': 3
-            },
-            5: {
-                'west': 4,
-                'south': 6
-            },
-            6: {
-                'north': 5,
-                'east': 7
-            },
-            7: {
-                'west': 6,
-                'north': 8
-            },
-            8: {
-                'south': 7,
+                'north': 3},
+            5: {'west': 4,
+                'south': 6},
+            6: {'north': 5,
+                'east': 7},
+            7: {'west': 6,
+                'north': 8},
+            8: {'south': 7,
                 'west': 9,
-                'east': 10
-            },
-            9: {
-                'east': 8
-            },
-            10: {
-                'west': 8,
-                'south': 11
-            },
-            11: {
-                'north': 10,
-                'east': 12
-            },
-            12: {
-                'west': 11
-            },
-            13: {
-                'north': 4,
-                'east': 14
-            },
-            14: {
-                'west': 13
-            }
+                'east': 10},
+            9: {'east': 8},
+            10: {'west': 8,
+                 'south': 11},
+            11: {'north': 10,
+                 'east': 12},
+            12: {'west': 11},
+            13: {'north': 4,
+                 'east': 14},
+            14: {'west': 13}
         },
         {
-            1: {
-                'north': 2
-            },
-            2: {
-                'south': 1,
-                'west': 3
-            },
-            3: {
-                'east': 2,
-                'south': 4
-            },
-            4: {
-                'north': 3,
+            1: {'north': 2},
+            2: {'south': 1,
+                'west': 3},
+            3: {'east': 2,
+                'south': 4},
+            4: {'north': 3,
                 'east': 5,
-                'south': 9
-            },
-            5: {
-                'west': 4,
-                'south': 6
-            },
-            6: {
-                'north': 5,
-                'east': 7
-            },
-            7: {
-                'west': 6,
-                'north': 8
-            },
-            8: {
-                'south': 7
-            },
-            9: {
-                'north': 4,
-                'south': 10
-            },
-            10: {
-                'north': 9,
-                'east': 11
-            },
-            11: {
-                'west': 10
-            }
+                'south': 9},
+            5: {'west': 4,
+                'south': 6},
+            6: {'north': 5,
+                'east': 7},
+            7: {'west': 6,
+                'north': 8},
+            8: {'south': 7},
+            9: {'north': 4,
+                'south': 10},
+            10: {'north': 9,
+                 'east': 11},
+            11: {'west': 10}
+        },
+        {
+            2: {'south': 3},
+            3: {'north': 2,
+                'east': 4},
+            4: {'west': 3,
+                'north': 5},
+            5: {'west': 6,
+                'south': 4},
+            6: {'east': 5,
+                'south': 7},
+            7: {'north': 6,
+                'east': 8},
+            8: {'west': 7,
+                'north': 9},
+            9: {'south': 8,
+                'west': 10},
+            10: {'east': 9},
         }]
     for room_map in room_maps:
         rooms = list(room_map.keys())
