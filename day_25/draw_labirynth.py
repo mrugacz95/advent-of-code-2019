@@ -28,6 +28,8 @@ def is_correct(room_map):
         for d, n in neigh.items():
             if d not in ['north', 'east', 'south', 'west']:
                 return False, f'Wrong direction {d}'
+            if n is None:
+                continue
             if opposite(d) not in room_map[n]:
                 return False, f'One direction connection: from {node} to {n} but not from {n} to {node}'
             if room_map[n][opposite(d)] != node:
@@ -120,6 +122,8 @@ def draw(room_map, start_node=None):
         raise RuntimeError(f"Unexpected error. Position not found: {room_name} {positions}")
 
     def insert_node(pos, room_name, from_dir=None):
+        if room_name is None:
+            return
         if pos in positions and positions[pos] != room_name:  # pos already taken, need to move
             prev_neigh_pos = move_position(pos, opposite(from_dir))
             move_room(prev_neigh_pos, opposite(from_dir), room_name)
