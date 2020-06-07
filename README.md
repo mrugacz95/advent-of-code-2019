@@ -30,7 +30,9 @@ https://adventofcode.com/2019
 | 19 | Octave/MATLAB | &#x2611; | Octave GUI |
 | 20 | Perl | &#x2611; | PyCharm |
 | 21 | Rust | &#x2611; | PyCharm |
-| 22 | Ada | 
-| 23 | ~~Pascal~~ Haskel | 
-| 24 | Dart | 
-| 25 | ~~F#~~ Elixir | 
+| 22 | Ada* | &#x2611; | Pycharm |
+| 23 | ~~Pascal~~ Erlang | &#x2611; | Pycharm |
+| 24 | Dart | &#x2611; | Pycharm |
+| 25 | ~~F#~~ Haskell* | &#x2611; | Atom |
+
+\* Used Python in some part 
