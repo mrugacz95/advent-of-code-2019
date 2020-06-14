@@ -35,4 +35,8 @@ https://adventofcode.com/2019
 | 24 | Dart | &#x2611; | Pycharm |
 | 25 | ~~F#~~ Haskell* | &#x2611; | Atom |
 
-\* Used Python in some part 
+\* Used Python in some part
+
+### Summary
+
+![Summary](docs/summary.png)
