@@ -132,16 +132,14 @@ def main():
 
     repo = Repo('.')
 
-    plt.figure(figsize=(17, 5))
+    plt.style.use('seaborn-darkgrid')
     fig, (ax_top, ax_bot) = plt.subplots(nrows=2, ncols=1)
     fig.set_figwidth(17)
     fig.set_figheight(10)
-    plt.subplots_adjust(bottom=0.15)
-    plt.style.use('seaborn-darkgrid')
     for day_num in range(1, 25 + 1):
         dir_path = f"day_{day_num}"
         locs.append(day_num)
-        labels.append(f"Day {day_num}")
+        labels.append(day_num)
 
         files = get_files(dir_path)
 
@@ -184,7 +182,10 @@ def main():
     handles, labels = ax_top.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     ax_top.set_ylabel("Lines of code")
+    ax_top.set_xlabel("Day")
     ax_bot.set_ylabel("Completion duration")
+    ax_bot.set_xlabel("Day")
+    fig.suptitle("Advent of Code summary", fontsize=16)
     ax_top.legend(by_label.values(), by_label.keys(), ncol=8)
     plt.savefig('docs/summary.png')
     plt.show()
